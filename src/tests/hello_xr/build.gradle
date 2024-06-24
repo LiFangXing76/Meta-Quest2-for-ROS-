@@ -1,0 +1,114 @@
+// Copyright (c) 2020-2024, The Khronos Group Inc.
+//
+// SPDX-License-Identifier: Apache-2.0
+
+// Open this directory in Android Studio, or build with Gradle,
+// to build the "hello_xr" sample application
+
+plugins {
+    id 'com.android.application' version '8.3.1'
+    id 'org.jetbrains.kotlin.android' version '1.6.21' apply false
+    id 'com.android.library' version '8.3.1' apply false
+}
+
+
+// These next few lines are just to make the version match the OpenXR release.
+project.ext.repoRoot = file('../../../')
+apply from: file('../../version.gradle')
+
+android {
+    compileSdk 32
+    ndkVersion "26.3.11579264"
+    buildToolsVersion = "34.0.0"
+    namespace 'org.khronos.openxr.hello_xr'
+
+    defaultConfig {
+        applicationId "org.khronos.openxr.hello_xr"
+        // for Vulkan, need at least 24
+        minSdkVersion 24
+
+        versionName = project.versionOpenXR.toString() + project.versionQualifier
+        versionCode = project.versionOpenXR.getVersionCode()
+
+        externalNativeBuild {
+            cmake {
+                cppFlags "-std=c++11 -frtti -fexceptions"
+                arguments '-DBUILD_API_LAYERS=OFF',
+                        '-DBUILD_TESTS=ON',
+                        '-DBUILD_LOADER=ON',
+                        '-DBUILD_CONFORMANCE_TESTS=OFF',
+                        '-DBUILD_ALL_EXTENSIONS=ON',
+                        "-DANDROID_STL=c++_shared"
+                
+                targets "openxr_loader", "hello_xr"
+            }
+        }
+    }
+    sourceSets {
+        main {
+            manifest.srcFile 'AndroidManifest.xml'
+            res.srcDir 'android_resources'
+            assets.srcDirs 'src/assets'
+        }
+        Vulkan {
+            res.srcDir 'android_resources/vulkan'
+        }
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+        }
+    }
+
+    externalNativeBuild {
+        cmake {
+            path "${project.repoRoot}/CMakeLists.txt"
+        }
+    }    
+
+    flavorDimensions 'api'
+
+    productFlavors {
+        Vulkan {
+            dimension 'api'
+            applicationIdSuffix '.vulkan'
+            externalNativeBuild.cmake.arguments += '-DHELLOXR_DEFAULT_GRAPHICS_PLUGIN=Vulkan'
+
+            resValue "string", "app_name", "Hello XR (Vulkan)"
+        }
+    }
+    
+}
+
+// For signing of release binaries - env var must contain an absolute path
+// CI always does this.
+def keystorePropertiesFilename = System.getenv("KEYSTORE_PROPERTIES")
+if (keystorePropertiesFilename) {
+    def keystorePropertiesFile = file("${keystorePropertiesFilename}")
+    if (keystorePropertiesFile.exists()) {
+        println("Signing release artifacts for hello_xr")
+        def keystoreProperties = new Properties()
+        keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
+        android.signingConfigs {
+            release {
+                keyAlias keystoreProperties['keyAlias']
+                keyPassword keystoreProperties['keyPassword']
+                storeFile file("${project.repoRoot}/" + keystoreProperties['storeFile'])
+                storePassword keystoreProperties['storePassword']
+            }
+        }
+        android.buildTypes.release.signingConfig android.signingConfigs.release
+    }
+}
+
+afterEvaluate {
+    if (project.hasProperty('compileDebugJavaWithJavac'))
+        project.compileDebugJavaWithJavac.dependsOn 'externalNativeBuildDebug'
+    if (project.hasProperty('compileReleaseJavaWithJavac'))
+        project.compileReleaseJavaWithJavac.dependsOn 'externalNativeBuildRelease'
+}
+
+dependencies {
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
+}

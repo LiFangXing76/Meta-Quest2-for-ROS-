@@ -1,0 +1,20 @@
+# Copyright (c) 2017-2024, The Khronos Group Inc.
+#
+# SPDX-License-Identifier: Apache-2.0
+
+scripts/__pycache__
+generated/*
+example-builds/generated/
+artifacts/
+temp/
+diffs/
+
+# Artifacts from converting/checking RELAX-NG Compact schema.
+registry/registry.rng
+registry/regenerated.rnc
+registry/regenerated.rnc.backup
+
+# Schematron-related files
+registry/schxslt-cli.jar
+registry/cli-*.jar
+registry/**/*.srvl

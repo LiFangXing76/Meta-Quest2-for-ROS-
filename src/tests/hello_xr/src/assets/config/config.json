@@ -1,0 +1,60 @@
+{
+  "streams": {
+    "main": {
+      "type": "stereo",
+      "left_port": 62000,
+      "right_port": 62001,
+      "width": 1920,
+      "height": 1080,
+      "fps": 30,
+      "codec": "h264",
+      "position": {
+        "r":1.5,
+        "theta":2.0,
+        "phi":0.0
+      }
+    },
+    "left": {
+      "type": "mono",
+      "port": 62002,
+      "width": 1920,
+      "height": 1080,
+      "fps": 30,
+      "codec": "h264",
+      "position": {
+        "scale":1.0,
+        "r":1.5,
+        "theta":2.0,
+        "phi":0.0
+      }
+    },
+    "right": {
+      "type": "mono",
+      "port": 62003,
+      "width": 1920,
+      "height": 1080,
+      "fps": 30,
+      "codec": "h264",
+      "position": {
+        "scale":1.0,
+        "r":1.5,
+        "theta":2.0,
+        "phi":0.0
+      }
+    },
+    "left_grip": {
+      "type": "mono",
+      "port": 62004,
+      "width": 1280,
+      "height": 720,
+      "fps": 30,
+      "codec": "h264",
+      "position": {
+        "scale":1.0,
+        "r":1.5,
+        "theta":2.0,
+        "phi":0.0
+      }
+    }
+  }
+}
